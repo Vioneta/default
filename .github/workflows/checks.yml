@@ -41,7 +41,7 @@ jobs:
           python-version-file: ".python-version"
 
       - name: Clone origin
-        run: git clone --depth 1 https://github.com/hacs/default /tmp/repositories/default
+        run: git clone --depth 1 https://github.com/Vioneta/default /tmp/repositories/default
 
       - name: Set repository
         id: repository

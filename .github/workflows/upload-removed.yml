@@ -1,4 +1,4 @@
-name: Upload removed file to R2
+name: Upload removed file to TEBI
 
 on:
   workflow_dispatch:
@@ -52,28 +52,28 @@ jobs:
           path: upload/removed
           if-no-files-found: error
 
-      - name: Upload to R2
+      - name: Upload to TEBI
         run: |
           aws s3 sync \
             upload/removed \
-            s3://data-v2/removed \
-            --endpoint-url ${{ secrets.CF_R2_ENDPOINT_DATA }}
+            s3://vps-data/removed \
+            --endpoint-url ${{ secrets.CF_TEBI_ENDPOINT_DATA }}
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.CF_R2_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.CF_R2_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.CF_TEBI_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.CF_TEBI_SECRET_ACCESS_KEY }}
 
-      - name: Bust Cloudflare cache
-        run: |
-          curl --silent --show-error --fail -X POST \
-            "https://api.cloudflare.com/client/v4/zones/${{ secrets.CF_ZONE_ID }}/purge_cache" \
-            -H "Authorization: Bearer ${{ secrets.CF_BUST_CACHE_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            --data '{"files": ["https:\/\/data-v2.hacs.xyz\/removed\/data.json", "https:\/\/data-v2.hacs.xyz\/removed\/repositories.json"]}'
+      # - name: Bust Cloudflare cache
+      #   run: |
+      #     curl --silent --show-error --fail -X POST \
+      #       "https://api.cloudflare.com/client/v4/zones/${{ secrets.CF_ZONE_ID }}/purge_cache" \
+      #       -H "Authorization: Bearer ${{ secrets.CF_BUST_CACHE_TOKEN }}" \
+      #       -H "Content-Type: application/json" \
+      #       --data '{"files": ["https:\/\/data-v2.hacs.xyz\/removed\/data.json", "https:\/\/data-v2.hacs.xyz\/removed\/repositories.json"]}'
 
-      - name: Discord notification
-        if: ${{ github.event_name == 'schedule' && failure() }}
-        run: |
-          curl \
-            -H "Content-Type: application/json" \
-            -d '{"username": "GitHub action failure", "content": "[Scheduled action failed!](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})"}' \
-            ${{ secrets.DISCORD_WEBHOOK_ACTION_FAILURE }}
+      # - name: Discord notification
+      #   if: ${{ github.event_name == 'schedule' && failure() }}
+      #   run: |
+      #     curl \
+      #       -H "Content-Type: application/json" \
+      #       -d '{"username": "GitHub action failure", "content": "[Scheduled action failed!](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}})"}' \
+      #       ${{ secrets.DISCORD_WEBHOOK_ACTION_FAILURE }}
